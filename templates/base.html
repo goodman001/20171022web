@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>unswtalk</title>
+<link href="{{url_for('static', filename='UNSWtalk.css')}}") rel="stylesheet">
+</head>
+<body>
+
+<div class="unswtalk_heading">
+UNSWtalk
+</div>
+<nav class="navbar">
+<ul class="horizontal">
+  <li><a class="active"  href="javascript:void(0)">Home</a></li>
+  <li><a href="javascript:void(0)">News</a></li>
+  <li><a href="javascript:void(0)">Contact</a></li>
+  <li class="navrightli" ><a href="javascript:void(0)">About</a></li>
+</ul>
+
+</nav>
+{% block body_contents %}
+{% endblock %}
+
+</body>
+</html>

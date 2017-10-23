@@ -165,14 +165,23 @@ class Posts(Table):
 
     def __init__(self, data_file):
         super(Posts, self).__init__(data_file, 'posts',
-                                   ['zid TEXT', 'commentid TEXT','latitude NUMERIC','longitude NUMERIC','message TEXT','createdate DATETIME'])
+                                   ['zid TEXT', 'postid TEXT','latitude NUMERIC','longitude NUMERIC','message TEXT','createdate DATETIME'])
     def insert(self, *args):
         self.free(super(Posts, self).insert(*args))
 class Comments(Table):
 
     def __init__(self, data_file):
         super(Comments, self).__init__(data_file, 'comments',
-                                   ['maincommentid TEXT', 'commentid TEXT','message TEXT','createdate DATETIME'])
+                                   ['postid TEXT', 'commentid TEXT','zid','message TEXT','createdate DATETIME'])
+    def insert(self, *args):
+        self.free(super(Comments, self).insert(*args))    
+class Replies(Table):
+
+    def __init__(self, data_file):
+        super(Replies, self).__init__(data_file, 'replies',
+                                   ['commentid TEXT', 'replyid TEXT','zid','message TEXT','createdate DATETIME'])
+    def insert(self, *args):
+        self.free(super(Replies, self).insert(*args))  
 def readUserprofile(userobj,friobj,fn,imgflag):
 	print("[**]" + fn)
 	zid = ''
@@ -194,38 +203,38 @@ def readUserprofile(userobj,friobj,fn,imgflag):
 			break
 		#print(line)
 		line = re.sub(r'\s$', "", line)
-		if("zid" in line):
+		if(re.match('^[ ]*zid:',line)):
 			tmp = re.split(':[ ]*',line)
 			zid = tmp[1]
-		elif("password" in line):
+		elif(re.match('^[ ]*password:',line)):
 			tmp = re.split(':[ ]*',line)
 			password = tmp[1]
-		elif("email" in line):
+		elif(re.match('^[ ]*email:',line)):
 			tmp = re.split(':[ ]*',line)
 			email = tmp[1]
-		elif("full_name" in line):
+		elif(re.match('^[ ]*full_name:',line)):
 			tmp = re.split(':[ ]*',line)
 			full_name = tmp[1]
-		elif("birthday" in line):
+		elif(re.match('^[ ]*birthday:',line)):
 			tmp = re.split(':[ ]*',line)
 			birthday = tmp[1]
-		elif("courses" in line):
+		elif(re.match('^[ ]*courses:',line)):
 			tmp = re.split(':[ ]*',line)
 			#courses = tmp[1]
 			courses = re.sub(r'[\(\)\s]+', "", tmp[1])
-		elif("home_suburb" in line):
+		elif(re.match('^[ ]*home_suburb:',line)):
 			tmp = re.split(':[ ]*',line)
 			home_suburb = tmp[1]
-		elif("home_latitude" in line):
+		elif(re.match('^[ ]*home_latitude:',line)):
 			tmp = re.split(':[ ]*',line)
 			home_latitude = tmp[1]
-		elif("home_longitude" in line):
+		elif(re.match('^[ ]*home_longitude:',line)):
 			tmp = re.split(':[ ]*',line)
 			home_longitude = tmp[1]
-		elif("program" in line):
+		elif(re.match('^[ ]*program:',line)):
 			tmp = re.split(':[ ]*',line)
 			program = tmp[1]
-		elif("friend" in line):
+		elif(re.match('^[ ]*friends:',line)):
 			tmp = re.split(':[ ]*',line)
 			friend = tmp[1]
 			
@@ -254,11 +263,85 @@ def readUserprofile(userobj,friobj,fn,imgflag):
 		print("[**]student has existed")
 	#print(fs)
 	pass
-def findComment(root,child):
-	pass
-def storePost(fn,posts,dirname):
+def findreply(commentid,fn,replies):
+    print("[++++++] replyfile: " + fn) 
+    #print(postid)
+    #print(file)
+    replyid = str(uuid.uuid1())
+    zid = '' 
+    message = ''
+    createdate = ''
+    file = open(fn)
+    while 1:
+        line = file.readline()
+        if not line:
+            break
+        #print(line)
+        line = re.sub(r'\s$', "", line)
+        if(re.match('^[ ]*from:',line)):
+            tmp = re.split(':[ ]*',line)
+            zid = tmp[1]
+        elif(re.match('^[ ]*time:',line)):
+            tmp = re.split(':[ ]*',line,1)
+            createdate = tmp[1]
+        elif(re.match('^[ ]*message:',line)):
+            tmp = re.split(':[ ]*',line,1)
+            message = tmp[1]
+    '''
+    print("commentid:" + commentid )
+    print("replyid:" + replyid)
+    print("zid:" + zid)
+    print("message:" + message )
+    print("createdate:" + createdate )
+    '''
+    print("[******] replyid:" + replyid)
+    #coments.insert(postid,commentid,zid,message,createdate)
+    replies.insert(commentid,replyid,zid,message,createdate)
+    pass
+def findComment(postid,fn,coments,replies,dirname):
+    #print(postid)
+    #print(file)
+    print("[++++] commentfile: " + fn) 
+    commentid = str(uuid.uuid1())
+    zid = '' 
+    message = ''
+    createdate = ''
+    file = open(dirname + '/' + fn)
+    while 1:
+        line = file.readline()
+        if not line:
+            break
+        #print(line)
+        line = re.sub(r'\s$', "", line)
+        if(re.match('^[ ]*from:',line)):
+            tmp = re.split(':[ ]*',line)
+            zid = tmp[1]
+        elif(re.match('^[ ]*time:',line)):
+            tmp = re.split(':[ ]*',line,1)
+            createdate = tmp[1]
+        elif(re.match('^[ ]*message:',line)):
+            tmp = re.split(':[ ]*',line,1)
+            message = tmp[1]
+    '''
+    print("postid:" + postid)
+    print("commentid:" + commentid )
+    print("zid:" + zid)
+    print("message:" + message )
+    print("createdate:" + createdate )
+    '''
+    print("[*****] commentid:" + commentid )
+    coments.insert(postid,commentid,zid,message,createdate)
+    for file in os.listdir(dirname):
+        num = fn.replace(".txt","")
+        #find comment
+        if(re.match("^"+ num +"-[0-9]+[.]{1}",file)):
+            findreply(commentid,dirname + "/"+file,replies)
+            
+    pass
+def storePost(fn,posts,comments,replies,dirname):
+	print("[--]post file : " + fn)
 	zid = ''
-	commentid = str(uuid.uuid1())
+	postid = str(uuid.uuid1())
 	latitude = ''
 	longitude = ''
 	message = ''
@@ -270,33 +353,38 @@ def storePost(fn,posts,dirname):
 			break
 		#print(line)
 		line = re.sub(r'\s$', "", line)
-		if("from" in line):
-			tmp = re.split(':[ ]*',line)
-			zid = tmp[1]
-		elif("time" in line):
-			tmp = re.split(':[ ]*',line,1)
-			createdate = tmp[1]
-		elif("latitude" in line):
-			tmp = re.split(':[ ]*',line)
-			latitude = tmp[1]
-		elif("longitude" in line):
-			tmp = re.split(':[ ]*',line)
-			longitude = tmp[1]
-		elif("message" in line):
-			tmp = re.split(':[ ]*',line,1)
-			message = tmp[1]
-	print("zid:" + zid )
-	print("commentid:" + commentid)
+		if(re.match('^[ ]*from:',line)):
+		    tmp = re.split(':[ ]*',line)
+		    zid = tmp[1]
+		elif(re.match('^[ ]*time:',line)):
+		    tmp = re.split(':[ ]*',line,1)
+		    createdate = tmp[1]
+		elif(re.match('^[ ]*latitude:',line)):
+		    tmp = re.split(':[ ]*',line)
+		    latitude = tmp[1]
+		elif(re.match('^[ ]*longitude:',line)):
+		    tmp = re.split(':[ ]*',line)
+		    longitude = tmp[1]
+		elif(re.match('^[ ]*message:',line)):
+		    tmp = re.split(':[ ]*',line,1)
+		    message = tmp[1]
+	'''
+    print("zid:" + zid )
+	print("postid:" + postid)
 	print("latitude:" + latitude )
 	print("longitude:" + longitude )
 	print("message:" + message )
 	print("createdate:" + createdate )
-	posts.insert(zid,commentid,latitude,longitude,message,createdate)
+    '''
+	print("[****] postid:" + postid)
+	posts.insert(zid,postid,latitude,longitude,message,createdate)
 	for file in os.listdir(dirname):
 		#print(file)
 		num = fn.replace(".txt","")
+        #find comment
 		if(re.match("^"+ num +"-[0-9]+[.]{1}",file)):
-			print(file)
+			findComment(postid,file,comments,replies,dirname)
+			#print(file)
 	
 	
 if __name__ == '__main__':
@@ -318,24 +406,23 @@ if __name__ == '__main__':
 	user = User(ROOT+'.db')
 	friend = Friend(ROOT+'.db')
 	posts = Posts(ROOT+'.db')
-	
+	comments = Comments(ROOT+'.db')
+	replies = Replies(ROOT+'.db')
 	for dir in os.listdir(ROOT):
 		print("[+]student zid : " + dir);
 		for file in os.listdir(ROOT + "/"+ dir):	
 			#print(file)
 			if(file == "student.txt" and "img.jpg" in os.listdir(ROOT + "/"+ dir)):
-				#readUserprofile(user,friend,ROOT + "/"+ dir + '/' + file,1)
+				readUserprofile(user,friend,ROOT + "/"+ dir + '/' + file,1)
 				pass
 			elif(file == "student.txt" and "img.jpg" not in os.listdir(ROOT + "/"+ dir)):
-				#readUserprofile(user,friend,ROOT + "/"+ dir + '/' + file,0)
+				readUserprofile(user,friend,ROOT + "/"+ dir + '/' + file,0)
 				pass
 			elif("img" not in file ):
 				#print(file)
 				if(re.match("^[0-9]+[.]{1}.",file)):
-					print(file)
-					storePost(file,posts,ROOT + "/"+ dir)
+					storePost(file,posts,comments,replies,ROOT + "/"+ dir)
 				pass
-		break
 	
 	
 	
