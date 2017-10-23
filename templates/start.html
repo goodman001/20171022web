@@ -1,14 +1,42 @@
 {% extends "base.html" %}
 
 {% block body_contents %}
-<div class="unswtalk_user_details">
+<div class="content">
+	<div class="div2">
+		<img src="/img/profile" />
+	</div>
 
-{{student_details}}
+	<div class="div6">
+		<table class="table table-user-information">
+			<tbody>
+				<tr>
+					<td>Zid:</td>
+					<td>{{student_details[0]}}</td>
+				</tr>
+				<tr>
+					<td>Full_name:</td>
+					<td>{{student_details[3]}}</td>
+				</tr>
+				<tr>
+					<td>Birthday: </td>
+					<td>{{student_details[4]}}</td>
+				</tr>
+				<tr>
+					<td>Home_suburb:</td>
+					<td>{{student_details[7]}}</td>
+				</tr>
+				<tr>
+					<td>Program:</td>
+					<td>{{student_details[10]}}</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
 
 </div>
 
 <form method="POST" action="">
     <input type="hidden" name="n" value="7">
-    <input type="submit" value="Next student" class="unswtalk_button">
+    <input type="submit" value="Next student" class="btn btn3 padding3">
 </form>
 {% endblock %}

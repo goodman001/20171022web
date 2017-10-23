@@ -14,23 +14,24 @@ app = Flask(__name__)
 
 # Show unformatted details for student "n"
 # Increment n and store it in the session cookie
-
+def getStudent():
+    user = sqliteOp.User(students_dir+'.db')
+    cursor = user.select_all('*')
+    #print(cursor.fetchall())
+    students = cursor.fetchall()
+    cursor.close()
+    return students
 @app.route('/', methods=['GET','POST'])
 @app.route('/start', methods=['GET','POST'])
 def start():
     n = session.get('n', 0)
-    user = sqliteOp.User(students_dir+'.db')
-    cursor = user.select_all('*')
-    print(cursor.fetchall())
-    cursor.close()
-    students = sorted(os.listdir(students_dir))
+    students = sorted(getStudent())
+    print(n % len(students));
     student_to_show = students[n % len(students)]
-    details_filename = os.path.join(students_dir, student_to_show, "student.txt")
-    with open(details_filename) as f:
-        details = f.read()
     session['n'] = n + 1
-    return render_template('start.html', student_details=details)
-
+    return render_template('start.html', student_details=student_to_show)
+@app.route('/img/profile', methods=['GET']):
+	
 if __name__ == '__main__':
     app.secret_key = os.urandom(12)
     app.run('0.0.0.0',debug=True)

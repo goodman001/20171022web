@@ -38,6 +38,71 @@ li {
     display: list-item;
     text-align: -webkit-match-parent;
 }
+.table {
+    width: 100%;
+    margin-bottom: 20px;
+}
+table {
+    max-width: 100%;
+    background-color: transparent;
+}
+table {
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+* {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+table {
+    display: table;
+    border-color: grey;
+}
+tr {
+    display: table-row;
+    vertical-align: inherit;
+    border-color: inherit;
+}
+td, th {
+    display: table-cell;
+    vertical-align: inherit;
+}
+.content{width:100%;float:left}
+.div10{width:100%;}
+.div1{
+	width:9%;float:left
+}
+.div2{width:19%;float:left}
+.div3{width:29%;float:left}
+.div4{width:39%;float:left}
+.div5{width:49%;float:left}
+.div6{width:59%;float:left}
+.div7{width:69%;float:left}
+.div8{width:79%;float:left}
+.div9{
+	width:89%;float:left;
+}
+.btn {
+    background-color: #4CAF50;
+    border: none;
+    color: #FFFFFF;
+    padding: 15px 32px;
+    text-align: center;
+    -webkit-transition-duration: 0.4s;
+    transition-duration: 0.4s;
+    margin: 16px 0 !important;
+    text-decoration: none;
+    font-size: 16px;
+    cursor: pointer;
+}
+.btn3 {
+    background-color: #f44336;
+}
+.padding3 {
+    padding: 14px 40px;
+}
+
 .navbar{
 	width:100%;
 }
@@ -66,4 +131,15 @@ li {
 .horizontal .navrightli{
     float:right
 }
+.table-user-information > tbody > tr {
+    border-top: 1px solid rgb(221, 221, 221);
+}
 
+.table-user-information > tbody > tr:first-child {
+    border-top: 0;
+}
+
+
+.table-user-information > tbody > tr > td {
+    border-top: 0;
+}
