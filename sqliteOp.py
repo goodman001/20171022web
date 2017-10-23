@@ -169,7 +169,7 @@ class User(Table):
         return len(results) > 0
 
     def authenticate(self, username, password):
-        results = self.select('username', username=username,
+        results = self.select('zid', zid=username,
                               password=password)
         return len(results) > 0
     def searchbyname(self, *args, **kwargs):

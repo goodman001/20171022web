@@ -7,7 +7,7 @@
 			<center>
 				<form method="POST" action="/searchname">
 					<input type="text" name="searchname" placeholder="Search for name" required>
-					<input type="submit" value="Next student" class="btn btn3 padding3">
+					<input type="submit" value="Search" class="btn btn3 padding3">
 				</form>
 			</center>
 			
@@ -19,10 +19,10 @@
 		{% endif %}
 		{% for item in search_list: %}
 		<div class="gallery">
-		  <a target="_blank" href="img_fjords.jpg">
+		  <a href="/students/{{item[0]}}">
 			<img src="/images/{{item[0]}}">
 		  </a>
-		  <div class="desc">{{item[0]}}</div>
+		  <div class="desc"><a href="/students/{{item[0]}}">{{item[3]}}</a></div>
 		</div>	
 		{% endfor %}
 	</div>

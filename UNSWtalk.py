@@ -50,6 +50,9 @@ def getPost(zid):
     posts = post.select_order('*',zid = zid)
     #print(posts)
     return posts
+def checkLogin(zid,pwd):
+    user = sqliteOp.User(students_dir+'.db')
+    return user.authenticate(zid,pwd)
 @app.route('/', methods=['GET','POST'])
 @app.route('/start', methods=['GET','POST'])
 def start():
@@ -99,11 +102,24 @@ def show_searchpage():
 def search_name():
     content = request.form['searchname']
     students = searchStudentByname(content)
-    #print(content)
+    print(students)
     flag = 0
     if(len(students) == 0):
         flag = 1
     return render_template('search.html',search_list = students,flag = flag)
+@app.route('/loginpage', methods=['GET'])
+def show_loginpage():
+    return render_template('login.html')
+@app.route('/checklogin', methods=['POST'])
+def check_login():
+    zid = request.form['zid']
+    password = request.form['password']
+    if(checkLogin(zid,password)):
+        session['zid'] = zid
+        return render_template('posts.html')
+    else:
+        return render_template('loginerror.html')
+    #return render_template('login.html')
 if __name__ == '__main__':
     app.secret_key = os.urandom(12)
     app.run('0.0.0.0',debug=True)

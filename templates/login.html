@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block body_contents %}
+<div class="content">
+	<div class="div10">
+		<div class="well">
+			<h3>Welcome to login</h3>
+			<center>
+				<form method="POST" action="/checklogin">
+					<label for="zid">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Zid: </label>
+					<input type="text" id="zid" name="zid" maxlength="30" minlength="5" placeholder="Your zid.." required>
+					<br>
+					<br>
+					<label for="password">Password: </label>
+					<input type="password" id="password" name="password" maxlength="30" minlength="1" placeholder="Your password" required>
+					<br>
+					<input type="submit" class="submitbtn" value="Submit">
+				  </form>
+			</center>
+			
+		</div>		
+	</div>
+
+</div>
+{% endblock %}

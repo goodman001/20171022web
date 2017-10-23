@@ -71,8 +71,8 @@ td, th {
     display: table-cell;
     vertical-align: inherit;
 }
-.content{width:100%;margin-top:2%;}
-.div10{width:100%;}
+.content{width:100%;margin-top:2%;height:100%}
+.div10{width:100%;height:100%}
 .div1{
 	width:9%;float:left
 }
@@ -177,7 +177,8 @@ td, th {
 	height:100px;
 	width:100%;
 }
-input[type=text] {
+label{width:10%;}
+input[type=text],input[type=password] {
     width: 80%;
     box-sizing: border-box;
     border: 2px solid #ccc;
@@ -188,12 +189,28 @@ input[type=text] {
     background-repeat: no-repeat;
     padding: 12px 20px 12px 40px;
 }
+.submitbtn{
+    width: 20%;
+    background-color: #4CAF50;
+    color: white;
+    padding: 14px 20px;
+    margin: 8px 0;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+input[type=submit]:hover {
+    background-color: #45a049;
+}
+
 
 div.gallery {
     margin: 5px;
     border: 1px solid #ccc;
     float: left;
     width: 15%;
+	height:15em;
 }
 
 div.gallery:hover {
@@ -208,4 +225,30 @@ div.gallery img {
 div.desc {
     padding: 15px;
     text-align: center;
+}
+.wellcomment {
+    height:100%;
+    padding: 0 1%;
+    margin-bottom: 1%;
+    background-color: #f5f5f5;
+    border: 1px solid #e3e3e3;
+    border-radius: 4px;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.05);
+    box-shadow: inset 0 1px 1px rgba(0,0,0,.05);
+}
+.pcomment{
+    font-size:1em;
+}
+.wellreply {
+    height:100%;
+    padding: 0 1%;
+    margin-bottom: 1%;
+    background-color: white;
+    border: 1px solid #e3e3e3;
+    border-radius: 4px;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.05);
+    box-shadow: inset 0 1px 1px rgba(0,0,0,.05);
+}
+.preply{
+    font-size:0.8em;
 }
