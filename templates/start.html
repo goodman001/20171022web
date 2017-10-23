@@ -2,40 +2,76 @@
 
 {% block body_contents %}
 <div class="content">
-	<div class="div2">
-		<img src="/img/profile" />
-	</div>
-
-	<div class="div6">
-		<table class="table table-user-information">
-			<tbody>
-				<tr>
-					<td>Zid:</td>
-					<td>{{student_details[0]}}</td>
-				</tr>
-				<tr>
-					<td>Full_name:</td>
-					<td>{{student_details[3]}}</td>
-				</tr>
-				<tr>
-					<td>Birthday: </td>
-					<td>{{student_details[4]}}</td>
-				</tr>
-				<tr>
-					<td>Home_suburb:</td>
-					<td>{{student_details[7]}}</td>
-				</tr>
-				<tr>
-					<td>Program:</td>
-					<td>{{student_details[10]}}</td>
-				</tr>
-			</tbody>
-		</table>
+	<div class="div10">
+		<div class="well">
+			<center>
+				<img class="personimg" src="/images/{{student_details[0]}}" />
+			</center>
+			
+		</div>
+		<div class="div10">
+			<div class="div5">
+				<h3>Student Information</h3>
+				<table class="table table-user-information">
+					<tbody>
+						<tr>
+							<td>Zid:</td>
+							<td>{{student_details[0]}}</td>
+						</tr>
+						<tr>
+							<td>Full_name:</td>
+							<td>{{student_details[3]}}</td>
+						</tr>
+						<tr>
+							<td>Birthday: </td>
+							<td>{{student_details[4]}}</td>
+						</tr>
+						<tr>
+							<td>Home_suburb:</td>
+							<td>{{student_details[7]}}</td>
+						</tr>
+						<tr>
+							<td>Program:</td>
+							<td>{{student_details[10]}}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="div5">
+				<h3>His/her Friends</h3>
+				{% for stu in student_friends: %}
+				<div class="div10 frienddiv">
+					<div class="div3">
+						<a href="/students/{{stu[0]}}"><img class="friendimg" src="/images/{{stu[0]}}" /></a>
+					</div>
+					<div class="div7">
+						<a href="/students/{{stu[0]}}">{{stu[1]}}</a>
+					</div>
+				</div>
+				<br>
+				<hr>
+				{% endfor %}
+			</div>
+			
+		</div>
+		<div class="div10">
+				<h3>His/her POSTs</h3>
+				{% for post in student_posts: %}
+				<div class="div10">
+					<h5>Post at {{post[5]}},  lat={{post[2]}},long={{post[3]}}</h5>
+					<p>
+						{{post[4]}}
+					</p>
+				</div>
+				<br>
+				<hr>
+				{% endfor %}
+		</div>
 	</div>
 
 </div>
 
-<form method="POST" action="">
+<form method="POST" action="/start">
     <input type="hidden" name="n" value="7">
     <input type="submit" value="Next student" class="btn btn3 padding3">
 </form>

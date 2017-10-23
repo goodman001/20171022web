@@ -6,13 +6,16 @@ import re
 import uuid
 queries = {
     'SELECT': 'SELECT %s FROM %s WHERE %s',
+	'SELECT_ORDER': 'SELECT %s FROM %s WHERE %s ORDER BY createdate desc',
     'SELECT_ALL': 'SELECT %s FROM %s',
     'INSERT': 'INSERT INTO %s VALUES(%s)',
     'UPDATE': 'UPDATE %s SET %s WHERE %s',
     'DELETE': 'DELETE FROM %s where %s',
     'DELETE_ALL': 'DELETE FROM %s',
     'CREATE_TABLE': 'CREATE TABLE IF NOT EXISTS %s(%s)',
-    'DROP_TABLE': 'DROP TABLE %s'}
+    'DROP_TABLE': 'DROP TABLE %s',
+	'SELECT_SEARCH_NAME': 'SELECT %s FROM %s WHERE %s',
+}
 
 
 class DatabaseObject(object):
@@ -48,7 +51,13 @@ class DatabaseObject(object):
         subs = [kwargs[k] for k in kwargs]
         query = queries['SELECT'] % (vals, locs, conds)
         return self.read(query, subs)
-
+    def select_order(self, tables, *args, **kwargs):
+        vals = ','.join([l for l in args])
+        locs = ','.join(tables)
+        conds = ' and '.join(['%s=?' % k for k in kwargs])
+        subs = [kwargs[k] for k in kwargs]
+        query = queries['SELECT_ORDER'] % (vals, locs, conds)
+        return self.read(query, subs)
     def select_all(self, tables, *args):
         vals = ','.join([l for l in args])
         locs = ','.join(tables)
@@ -88,7 +97,13 @@ class DatabaseObject(object):
 
     def disconnect(self):
         self.db.close()
-
+    def searchbyname(self, tables, *args, **kwargs):
+        vals = ','.join([l for l in args])
+        locs = ','.join(tables)
+        conds = ' and '.join(['%s like "%%%s%%"' % (k,kwargs[k]) for k in kwargs])
+        query = queries['SELECT_SEARCH_NAME'] % (vals, locs, conds)
+        #print(query)
+        return self.read(query)
 
 class Table(DatabaseObject):
 
@@ -99,7 +114,8 @@ class Table(DatabaseObject):
 
     def select(self, *args, **kwargs):
         return super(Table, self).select([self.table_name], *args, **kwargs)
-
+    def select_order(self, *args, **kwargs):
+        return super(Table, self).select_order([self.table_name], *args, **kwargs)
     def select_all(self, *args):
         return super(Table, self).select_all([self.table_name], *args)
 
@@ -117,7 +133,9 @@ class Table(DatabaseObject):
 
     def drop(self):
         return super(Table, self).drop_table(self.table_name)
-
+	
+    def searchbyname(self, *args, **kwargs):
+        return super(Table, self).searchbyname([self.table_name], *args, **kwargs)
 
 class User(Table):
 
@@ -154,6 +172,11 @@ class User(Table):
         results = self.select('username', username=username,
                               password=password)
         return len(results) > 0
+    def searchbyname(self, *args, **kwargs):
+        cursor = super(User, self).searchbyname(*args, **kwargs)
+        results = cursor.fetchall()
+        cursor.close()
+        return results
 class Friend(Table):
 
     def __init__(self, data_file):
@@ -161,6 +184,11 @@ class Friend(Table):
                                    ['mainzid TEXT', 'twozid TEXT'])
     def insert(self, *args):
         self.free(super(Friend, self).insert(*args))
+    def select(self, *args, **kwargs):
+        cursor = super(Friend, self).select(*args, **kwargs)
+        results = cursor.fetchall()
+        cursor.close()
+        return results
 class Posts(Table):
 
     def __init__(self, data_file):
@@ -168,6 +196,11 @@ class Posts(Table):
                                    ['zid TEXT', 'postid TEXT','latitude NUMERIC','longitude NUMERIC','message TEXT','createdate DATETIME'])
     def insert(self, *args):
         self.free(super(Posts, self).insert(*args))
+    def select_order(self, *args, **kwargs):
+        cursor = super(Posts, self).select_order(*args, **kwargs)
+        results = cursor.fetchall()
+        cursor.close()
+        return results
 class Comments(Table):
 
     def __init__(self, data_file):

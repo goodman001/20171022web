@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block body_contents %}
+<div class="content">
+	<div class="div10">
+		<div class="well">
+			<center>
+				<form method="POST" action="/searchname">
+					<input type="text" name="searchname" placeholder="Search for name" required>
+					<input type="submit" value="Next student" class="btn btn3 padding3">
+				</form>
+			</center>
+			
+		</div>		
+	</div>
+	<div class="div10">
+		{% if flag == 1 %}
+			<h4>Search result is null</h4>
+		{% endif %}
+		{% for item in search_list: %}
+		<div class="gallery">
+		  <a target="_blank" href="img_fjords.jpg">
+			<img src="/images/{{item[0]}}">
+		  </a>
+		  <div class="desc">{{item[0]}}</div>
+		</div>	
+		{% endfor %}
+	</div>
+
+</div>
+{% endblock %}

@@ -33,10 +33,13 @@
     color: #904142;
 }
 /* */
-body{width:100%;margin:0px}
+body{width:80%;margin:0 auto}
 li {
     display: list-item;
     text-align: -webkit-match-parent;
+}
+a{
+text-decoration:none;
 }
 .table {
     width: 100%;
@@ -68,18 +71,18 @@ td, th {
     display: table-cell;
     vertical-align: inherit;
 }
-.content{width:100%;float:left}
+.content{width:100%;margin-top:2%;}
 .div10{width:100%;}
 .div1{
 	width:9%;float:left
 }
-.div2{width:19%;float:left}
-.div3{width:29%;float:left}
-.div4{width:39%;float:left}
-.div5{width:49%;float:left}
-.div6{width:59%;float:left}
-.div7{width:69%;float:left}
-.div8{width:79%;float:left}
+.div2{width:19%;float:left;height:auto}
+.div3{width:29%;float:left;height:auto}
+.div4{width:39%;float:left;height:auto}
+.div5{width:49%;float:left;height:auto}
+.div6{width:59%;float:left;height:auto}
+.div7{width:68%;float:left;padding-left:1%;height:auto}
+.div8{width:79%;float:left;height:auto}
 .div9{
 	width:89%;float:left;
 }
@@ -102,6 +105,19 @@ td, th {
 .padding3 {
     padding: 14px 40px;
 }
+.well {
+    min-height: 10%;
+    padding: 19px;
+    margin-bottom: 20px;
+    background-color: #f5f5f5;
+    border: 1px solid #e3e3e3;
+    border-radius: 4px;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.05);
+    box-shadow: inset 0 1px 1px rgba(0,0,0,.05);
+}
+
+
+
 
 .navbar{
 	width:100%;
@@ -131,6 +147,10 @@ td, th {
 .horizontal .navrightli{
     float:right
 }
+.table-user-information {
+	width:80%;
+	margin-left:1%;
+}
 .table-user-information > tbody > tr {
     border-top: 1px solid rgb(221, 221, 221);
 }
@@ -142,4 +162,50 @@ td, th {
 
 .table-user-information > tbody > tr > td {
     border-top: 0;
+}
+.personimg{
+	width:20%;
+	border-radius: 50%;
+	vertical-align: middle;
+	border-radius: 50%;
+}
+.friendimg{
+	width:80%;
+	vertical-align: middle;
+}
+.frienddiv{
+	height:100px;
+	width:100%;
+}
+input[type=text] {
+    width: 80%;
+    box-sizing: border-box;
+    border: 2px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px;
+    background-color: white;
+    background-position: 10px 10px; 
+    background-repeat: no-repeat;
+    padding: 12px 20px 12px 40px;
+}
+
+div.gallery {
+    margin: 5px;
+    border: 1px solid #ccc;
+    float: left;
+    width: 15%;
+}
+
+div.gallery:hover {
+    border: 1px solid #777;
+}
+
+div.gallery img {
+    width: 100%;
+    height: auto;
+}
+
+div.desc {
+    padding: 15px;
+    text-align: center;
 }
