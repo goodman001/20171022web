@@ -7,7 +7,8 @@
 import os
 import sqliteOp
 from flask import Flask, render_template, session,request, send_from_directory
-
+from flask import Markup
+import re
 #students_dir = "dataset-medium";
 students_dir = "dataset-small";
 app = Flask(__name__)
@@ -50,9 +51,67 @@ def getPost(zid):
     posts = post.select_order('*',zid = zid)
     #print(posts)
     return posts
+def getRecentPost(zid):
+    post = sqliteOp.Posts(students_dir+'.db')
+    posts = post.select_order_recent('*',zid = zid)
+    #print(posts)
+    return posts
+def getComment(postid):
+    comment = sqliteOp.Comments(students_dir+'.db')
+    comments = comment.select_order('*',postid = postid)
+    return comments
+def getReply(commentid):
+    reply = sqliteOp.Replies(students_dir+'.db')
+    replies = reply.select_order('*',commentid = commentid)
+    return replies
 def checkLogin(zid,pwd):
     user = sqliteOp.User(students_dir+'.db')
     return user.authenticate(zid,pwd)
+def insteadOfZid(msg):
+    print("test instead")
+    #stu = getStudent(msg) #[]
+    zids = re.findall(r"z[0-9]{7}",msg)#
+    print(zids)
+    for z in zids:
+        stu = getStudent(z)
+        print(stu)
+        if(len(stu)>0):
+            msg = msg.replace(z,'''<a href="/students/''' + stu[0][0] + '''" >@''' + stu[0][3] + ''' </a>  ''')
+    return msg
+    
+def showPost(name,zid,posts):
+    showdiv = ""
+    for post in posts:
+            #print(post[1])
+            msg = insteadOfZid(post[4])
+            showdiv = showdiv + '''
+<h4 class="posttitle"><a href="/students/''' + zid + '''" >''' + name + ''' </a>make a Post at '''+ post[5]+''' </h4>
+<p class="pcontent">''' + msg + '''</p>'''
+            comments = getComment(post[1])
+            if(len(comments)>0):
+                showdiv = showdiv + '''
+<div class="div10 wellcomment">'''
+            for comment in comments:
+                stu = getStudent(comment[2])
+                msg = insteadOfZid(comment[3])
+                showdiv = showdiv + '''
+    <p class="pcomment"><strong><a href="/students/'''+ stu[0][0] + '''">'''+ stu[0][3] + ''' </a>comments at ''' + comment[4] + '''</strong></p>
+    <p class="pcomment">''' + msg + '''</p>'''
+                replies = getReply(comment[1])
+                #print(replies)
+                for reply in replies:
+                    ss = getStudent(reply[2])
+                    msg = insteadOfZid(reply[3])
+                    showdiv = showdiv + '''
+    <div class="div10 wellreply">
+					<p class="preply"><strong><a href="/students/'''+ ss[0][0] + '''">'''+ ss[0][3] + '''</a> reply at ''' + reply[4] + '''</strong></p>
+					<p class="preply">''' + msg + '''</p>
+    </div>
+                    '''
+            if(len(comments)>0):
+                showdiv = showdiv + '''
+</div>'''
+    return showdiv
 @app.route('/', methods=['GET','POST'])
 @app.route('/start', methods=['GET','POST'])
 def start():
@@ -102,7 +161,7 @@ def show_searchpage():
 def search_name():
     content = request.form['searchname']
     students = searchStudentByname(content)
-    print(students)
+    #print(students)
     flag = 0
     if(len(students) == 0):
         flag = 1
@@ -116,7 +175,19 @@ def check_login():
     password = request.form['password']
     if(checkLogin(zid,password)):
         session['zid'] = zid
-        return render_template('posts.html')
+        #show personal posts
+        recentposts = getRecentPost(zid)
+        showdiv = showPost("I",zid,recentposts)
+        recentposts = Markup(showdiv);
+        #show friend recent post
+        flist = getFriends(zid)
+        showf = ''
+        for friend in flist:
+            fposts = getRecentPost(friend[0])
+            showfri = showPost(friend[1],friend[0],fposts)
+            showf = showf + showfri;
+        friposts = Markup(showf);
+        return render_template('posts.html',recentposts = recentposts,friposts = friposts)
     else:
         return render_template('loginerror.html')
     #return render_template('login.html')

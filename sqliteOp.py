@@ -7,6 +7,8 @@ import uuid
 queries = {
     'SELECT': 'SELECT %s FROM %s WHERE %s',
 	'SELECT_ORDER': 'SELECT %s FROM %s WHERE %s ORDER BY createdate desc',
+    'SELECT_ORDER_ASC': 'SELECT %s FROM %s WHERE %s ORDER BY createdate asc',
+    'SELECT_ORDER_Recent': 'SELECT %s FROM %s WHERE %s ORDER BY createdate desc LIMIT 3',
     'SELECT_ALL': 'SELECT %s FROM %s',
     'INSERT': 'INSERT INTO %s VALUES(%s)',
     'UPDATE': 'UPDATE %s SET %s WHERE %s',
@@ -57,6 +59,20 @@ class DatabaseObject(object):
         conds = ' and '.join(['%s=?' % k for k in kwargs])
         subs = [kwargs[k] for k in kwargs]
         query = queries['SELECT_ORDER'] % (vals, locs, conds)
+        return self.read(query, subs)
+    def select_order_asc(self, tables, *args, **kwargs):
+        vals = ','.join([l for l in args])
+        locs = ','.join(tables)
+        conds = ' and '.join(['%s=?' % k for k in kwargs])
+        subs = [kwargs[k] for k in kwargs]
+        query = queries['SELECT_ORDER_ASC'] % (vals, locs, conds)
+        return self.read(query, subs)
+    def select_order_recent(self, tables, *args, **kwargs):
+        vals = ','.join([l for l in args])
+        locs = ','.join(tables)
+        conds = ' and '.join(['%s=?' % k for k in kwargs])
+        subs = [kwargs[k] for k in kwargs]
+        query = queries['SELECT_ORDER_Recent'] % (vals, locs, conds)
         return self.read(query, subs)
     def select_all(self, tables, *args):
         vals = ','.join([l for l in args])
@@ -116,6 +132,10 @@ class Table(DatabaseObject):
         return super(Table, self).select([self.table_name], *args, **kwargs)
     def select_order(self, *args, **kwargs):
         return super(Table, self).select_order([self.table_name], *args, **kwargs)
+    def select_order_asc(self, *args, **kwargs):
+        return super(Table, self).select_order_asc([self.table_name], *args, **kwargs)
+    def select_order_recent(self, *args, **kwargs):
+        return super(Table, self).select_order_recent([self.table_name], *args, **kwargs)
     def select_all(self, *args):
         return super(Table, self).select_all([self.table_name], *args)
 
@@ -201,13 +221,23 @@ class Posts(Table):
         results = cursor.fetchall()
         cursor.close()
         return results
+    def select_order_recent(self, *args, **kwargs):
+        cursor = super(Posts, self).select_order_recent(*args, **kwargs)
+        results = cursor.fetchall()
+        cursor.close()
+        return results
 class Comments(Table):
 
     def __init__(self, data_file):
         super(Comments, self).__init__(data_file, 'comments',
                                    ['postid TEXT', 'commentid TEXT','zid','message TEXT','createdate DATETIME'])
     def insert(self, *args):
-        self.free(super(Comments, self).insert(*args))    
+        self.free(super(Comments, self).insert(*args))  
+    def select_order(self, *args, **kwargs):
+        cursor = super(Comments, self).select_order_asc(*args, **kwargs)
+        results = cursor.fetchall()
+        cursor.close()
+        return results
 class Replies(Table):
 
     def __init__(self, data_file):
@@ -215,5 +245,9 @@ class Replies(Table):
                                    ['commentid TEXT', 'replyid TEXT','zid','message TEXT','createdate DATETIME'])
     def insert(self, *args):
         self.free(super(Replies, self).insert(*args)) 
-	
+    def select_order(self, *args, **kwargs):
+        cursor = super(Replies, self).select_order_asc(*args, **kwargs)
+        results = cursor.fetchall()
+        cursor.close()
+        return results
 	

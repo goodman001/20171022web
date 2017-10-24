@@ -237,7 +237,7 @@ div.desc {
     box-shadow: inset 0 1px 1px rgba(0,0,0,.05);
 }
 .pcomment{
-    font-size:1em;
+    font-size:0.8em;
 }
 .wellreply {
     height:100%;
@@ -252,3 +252,9 @@ div.desc {
 .preply{
     font-size:0.8em;
 }
+.pcontent{
+    font-size:0.9em;
+    margin-top:10px;
+    margin-bottom:10px;
+}
+.posttitle{color:green;font-size:0.8em;margin:0px;}
