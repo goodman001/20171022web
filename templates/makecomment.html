@@ -2,15 +2,20 @@
 
 {% block body_contents %}
 <div class="content">
+	<h2>Welcome , dear <i>{{username}}</i></h2>
+	<hr>
 	<div class="div10">
+	  <h3>Make a comment to the post</h3>
 		<div class="well">
-			
 			<center>
-				<h3>Login failed! zid or password is wrong </h3>
-				<br>
-				<a href="/loginpage" class="btn btn3 padding3">Return login page</a>
+				<form method="POST" action="/postcomment">
+					<input type="hidden" name="postid" value="{{postid}}" required>
+					<input type="text" name="postcontent" placeholder="write comment to this post..." required>
+					<br>
+					<input type="submit" value="Submit" class="btn btn3 padding3">
+				</form>
 			</center>
-			
+
 		</div>		
 	</div>
 

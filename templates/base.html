@@ -11,9 +11,15 @@ UNSWtalk
 </div>
 <nav class="navbar">
 <ul class="horizontal">
-  <li><a href='/' class="active"  href="javascript:void(0)">Home</a></li>
+  <li><a href='/' >Home</a></li>
   <li><a href="/searchpage">Search For names</a></li>
+  <li><a href="/searchpost">Search Posts</a></li>
+  {% if session['zid'] %}
+  <li class="navrightli" ><a href="/logout">Login Out</a></li>
+  {% else %}
   <li class="navrightli" ><a href="/loginpage">Login in</a></li>
+  {% endif %}
+  
 </ul>
 
 </nav>

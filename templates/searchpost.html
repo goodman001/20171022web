@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block body_contents %}
+<div class="content">
+	<div class="div10">
+		<div class="well">
+			<center>
+				<form method="POST" action="/searchpp">
+					<input type="text" name="searchname" placeholder="Search post for keyword" required>
+					<input type="submit" value="Search" class="btn btn3 padding3">
+				</form>
+			</center>
+			
+		</div>		
+	</div>
+	<div class="div10">
+		{% if flag == 1 %}
+			<h4>Search result is null</h4>
+		{% endif %}
+		{{ search_list }}
+	</div>
+
+</div>
+{% endblock %}

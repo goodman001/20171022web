@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block body_contents %}
+<div class="content">
+	<h2>Welcome , dear <i>{{username}}</i></h2>
+	<hr>
+	<div class="div10">
+	  <h3>Make a reply to the comment</h3>
+		<div class="well">
+			<center>
+				<form method="POST" action="/postreply">
+					<input type="hidden" name="commentid" value="{{commentid}}" required>
+					<input type="text" name="postcontent" placeholder="write reply to this comment..." required>
+					<br>
+					<input type="submit" value="Submit" class="btn btn3 padding3">
+				</form>
+			</center>
+
+		</div>		
+	</div>
+
+</div>
+{% endblock %}
