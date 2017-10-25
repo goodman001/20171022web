@@ -6,9 +6,11 @@
 
 import os
 import sqliteOp
-from flask import Flask, render_template, session,request, send_from_directory
+from flask import Flask, render_template, session,request, send_from_directory,escape
 from flask import Markup
 import re
+import uuid
+import time
 #students_dir = "dataset-medium";
 students_dir = "dataset-small";
 app = Flask(__name__)
@@ -68,24 +70,65 @@ def checkLogin(zid,pwd):
     user = sqliteOp.User(students_dir+'.db')
     return user.authenticate(zid,pwd)
 def insteadOfZid(msg):
-    print("test instead")
+    #print("test instead")
     #stu = getStudent(msg) #[]
     zids = re.findall(r"z[0-9]{7}",msg)#
-    print(zids)
+    #print(zids)
     for z in zids:
         stu = getStudent(z)
-        print(stu)
+        #print(stu)
         if(len(stu)>0):
             msg = msg.replace(z,'''<a href="/students/''' + stu[0][0] + '''" >@''' + stu[0][3] + ''' </a>  ''')
     return msg
-    
+def getIncludZid(zid):
+	post = sqliteOp.Posts(students_dir+'.db')
+	posts = post.select_order_leftjoin("posts.*",message=zid,message1=zid,message2=zid)
+	#print(posts)
+	return posts
 def showPost(name,zid,posts):
     showdiv = ""
     for post in posts:
             #print(post[1])
             msg = insteadOfZid(post[4])
             showdiv = showdiv + '''
-<h4 class="posttitle"><a href="/students/''' + zid + '''" >''' + name + ''' </a>make a Post at '''+ post[5]+''' </h4>
+<h4 class="posttitle"><a href="/students/''' + zid + '''" >''' + name + ''' </a>make a Post at '''+ post[5]+'''<i> <a class="makecomment" href="/makecomment/'''+ post[1] +'''"> comment</a></i></h4>
+<p class="pcontent">''' + msg + '''</p>'''
+            comments = getComment(post[1])
+            if(len(comments)>0):
+                showdiv = showdiv + '''
+<div class="div10 wellcomment">'''
+            for comment in comments:
+                stu = getStudent(comment[2])
+                msg = insteadOfZid(comment[3])
+                showdiv = showdiv + '''
+    <p class="pcomment"><strong><a href="/students/'''+ stu[0][0] + '''">'''+ stu[0][3] + ''' </a>comments at ''' + comment[4] + '''</strong></p>
+    <p class="pcomment">''' + msg + '''</p><a class="makereply" href="/makereply/'''+ comment[1] +'''">Reply</a>'''
+                replies = getReply(comment[1])
+                #print(replies)
+                for reply in replies:
+                    ss = getStudent(reply[2])
+                    msg = insteadOfZid(reply[3])
+                    showdiv = showdiv + '''
+    <div class="div10 wellreply">
+					<p class="preply"><strong><a href="/students/'''+ ss[0][0] + '''">'''+ ss[0][3] + '''</a> reply at ''' + reply[4] + '''</strong></p>
+					<p class="preply">''' + msg + '''</p>
+    </div>
+   
+                    '''
+            if(len(comments)>0):
+                showdiv = showdiv + '''
+</div>
+<hr>'''
+    return showdiv
+def showPostNew(posts):
+    showdiv = ""
+    for post in posts:
+            #print(post[1])
+            msg = insteadOfZid(post[4])
+            sn = getStudent(post[0])
+            zid = post[0]
+            showdiv = showdiv + '''
+<h4 class="posttitle"><a href="/students/''' + zid + '''" >''' + sn[0][3] + ''' </a>make a Post at '''+ post[5]+''' </h4>
 <p class="pcontent">''' + msg + '''</p>'''
             comments = getComment(post[1])
             if(len(comments)>0):
@@ -110,8 +153,23 @@ def showPost(name,zid,posts):
                     '''
             if(len(comments)>0):
                 showdiv = showdiv + '''
-</div>'''
+</div>
+<hr>'''
     return showdiv
+def makepost(zid,message):
+    latitude = ''
+    longitude = ''
+    postid = str(uuid.uuid1())
+    createdate = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) 
+    post = sqliteOp.Posts(students_dir+'.db')
+    post.insert(zid,postid,latitude,longitude,message,createdate)
+def makecomment(zid,message):
+    latitude = ''
+    longitude = ''
+    postid = str(uuid.uuid1())
+    createdate = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) 
+    post = sqliteOp.Posts(students_dir+'.db')
+    post.insert(zid,postid,latitude,longitude,message,createdate)
 @app.route('/', methods=['GET','POST'])
 @app.route('/start', methods=['GET','POST'])
 def start():
@@ -121,16 +179,16 @@ def start():
     student_to_show = students[n % len(students)]
     session['n'] = n + 1
     flist = getFriends(student_to_show[0])
-    print(flist)
+    #print(flist)
     student_posts = getPost(student_to_show[0])
     return render_template('start.html', student_details=student_to_show,student_friends = flist,student_posts = student_posts)
 @app.route("/images/<zid>")
 def get_image(zid):
-    print(students_dir + "/" + zid)
+    #print(students_dir + "/" + zid)
     return send_from_directory(students_dir + "/" + zid, "img.jpg")	
 @app.route('/students/<zid>', methods=['GET'])
 def get_one(zid):
-    print(zid)
+    #print(zid)
     stu = getStudent(zid)
     n = session.get('n', 0)
     students = sorted(getStudentAll())
@@ -171,10 +229,14 @@ def show_loginpage():
     return render_template('login.html')
 @app.route('/checklogin', methods=['POST'])
 def check_login():
+    session['zid'] = 0
     zid = request.form['zid']
     password = request.form['password']
     if(checkLogin(zid,password)):
         session['zid'] = zid
+        print("zid")
+        print(session['zid'])
+        stu = getStudent(zid)
         #show personal posts
         recentposts = getRecentPost(zid)
         showdiv = showPost("I",zid,recentposts)
@@ -183,14 +245,72 @@ def check_login():
         flist = getFriends(zid)
         showf = ''
         for friend in flist:
-            fposts = getRecentPost(friend[0])
+            fposts = getPost(friend[0])
             showfri = showPost(friend[1],friend[0],fposts)
             showf = showf + showfri;
         friposts = Markup(showf);
-        return render_template('posts.html',recentposts = recentposts,friposts = friposts)
+        includeposts = getIncludZid(zid)
+        showinclude = showPostNew(includeposts)
+        #print(includeinfo)
+        showinclude = Markup(showinclude);
+        return render_template('posts.html',username = stu[0][3],recentposts = recentposts,friposts = friposts,showinclude = showinclude)
     else:
         return render_template('loginerror.html')
     #return render_template('login.html')
+@app.route('/showmyprofile', methods=['GET'])
+def show_my_profile():
+    if re.match(r"^z[0-9]{7}$",session['zid']):
+        zid = session['zid']
+        print("zid")
+        print(session['zid'])
+        stu = getStudent(zid)
+        #show personal posts
+        recentposts = getRecentPost(zid)
+        showdiv = showPost("I",zid,recentposts)
+        recentposts = Markup(showdiv);
+        #show friend recent post
+        flist = getFriends(zid)
+        showf = ''
+        for friend in flist:
+            fposts = getPost(friend[0])
+            showfri = showPost(friend[1],friend[0],fposts)
+            showf = showf + showfri;
+        friposts = Markup(showf);
+        includeposts = getIncludZid(zid)
+        showinclude = showPostNew(includeposts)
+        #print(includeinfo)
+        showinclude = Markup(showinclude);
+        return render_template('posts.html',username = stu[0][3],recentposts = recentposts,friposts = friposts,showinclude = showinclude)
+    else:
+        return render_template('loginerror.html')
+    #return render_template('login.html')
+@app.route('/makepost', methods=['POST'])
+def make_post():
+    postcontent = request.form['postcontent']
+    #print(session['zid'])
+    if re.match(r"^z[0-9]{7}$",session['zid']) :
+        zid = session['zid']
+        try:
+            makepost(zid,postcontent)
+            return render_template('makepostsuc.html')
+        except:
+            return render_template('makepostwrong.html')
+    else:
+        return render_template('login.html')
+@app.route("/makecomment/<postid>")
+def make_comment(postid):
+    if re.match(r"^z[0-9]{7}$",session['zid']) :
+        return render_template('makecomment.html')
+    else:
+        return render_template('login.html')
+    '''
+    latitude = ''
+    longitude = ''
+    postid = str(uuid.uuid1())
+    createdate = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) 
+    post = sqliteOp.Posts(students_dir+'.db')
+    post.insert(zid,postid,latitude,longitude,message,createdate)
+    '''
 if __name__ == '__main__':
     app.secret_key = os.urandom(12)
     app.run('0.0.0.0',debug=True)

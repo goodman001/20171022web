@@ -2,20 +2,61 @@
 
 {% block body_contents %}
 <div class="content">
-	<div class="div10">
-		<h3>Recent posts</h3>
-		<div class="div10">
+  <h2>Welcome , dear <i>{{username}}</i></h2>
+  <hr>
+  <div class="div10">
+	  <h3>Make a new post</h3>
+		<div class="well">
+			<center>
+				<form method="POST" action="/makepost">
+					<input type="text" name="postcontent" placeholder="write something..." required>
+					<br>
+					<input type="submit" value="Submit" class="btn btn3 padding3">
+				</form>
+			</center>
+			
+		</div>		
+  </div>
+  <div class="postbar">
+    <button class="barbtn  tablink barbtnred" onclick="openCity(event,'recentpost')">Recent</button>
+    <button class="barbtn  tablink" onclick="openCity(event,'fripost')">Friends'</button>
+    <button class="barbtn  tablink" onclick="openCity(event,'inzid')">IncludeZid</button>
+  </div>
+  
+  <div id="recentpost" class="div10 city">
+    <h3>My Recent posts</h2>
+    <div class="div10">
 			{{recentposts}}
-		</div>
-		<br>
-		<hr>
-		<h3>Friends' Recent posts</h3>
-		<div class="div10">
-			{{friposts}}
-		</div>
-		<br>
-		<hr>
-	</div>
+    </div>
+  </div>
 
+  <div id="fripost" class="div10 city" style="display:none">
+    <h3>Friends' post</h2>
+    <div class="div10">
+			{{friposts}}
+	</div>
+  </div>
+
+  <div id="inzid" class="div10 city" style="display:none">
+    <h3>Include my zid posts</h2>
+    <div class="div10">
+			{{showinclude}}
+	</div>
+  </div>
 </div>
+<script>
+function openCity(evt, cityName) {
+  var i, x, tablinks;
+  x = document.getElementsByClassName("city");
+  for (i = 0; i < x.length; i++) {
+      x[i].style.display = "none";
+  }
+  tablinks = document.getElementsByClassName("tablink");
+  for (i = 0; i < x.length; i++) {
+      tablinks[i].className = tablinks[i].className.replace(" barbtnred", "");
+  }
+  document.getElementById(cityName).style.display = "block";
+  evt.currentTarget.className += " barbtnred";
+}
+</script>
 {% endblock %}

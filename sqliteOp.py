@@ -8,7 +8,7 @@ queries = {
     'SELECT': 'SELECT %s FROM %s WHERE %s',
 	'SELECT_ORDER': 'SELECT %s FROM %s WHERE %s ORDER BY createdate desc',
     'SELECT_ORDER_ASC': 'SELECT %s FROM %s WHERE %s ORDER BY createdate asc',
-    'SELECT_ORDER_Recent': 'SELECT %s FROM %s WHERE %s ORDER BY createdate desc LIMIT 3',
+    'SELECT_ORDER_Recent': 'SELECT %s FROM %s WHERE %s ORDER BY createdate desc LIMIT 10',
     'SELECT_ALL': 'SELECT %s FROM %s',
     'INSERT': 'INSERT INTO %s VALUES(%s)',
     'UPDATE': 'UPDATE %s SET %s WHERE %s',
@@ -17,6 +17,7 @@ queries = {
     'CREATE_TABLE': 'CREATE TABLE IF NOT EXISTS %s(%s)',
     'DROP_TABLE': 'DROP TABLE %s',
 	'SELECT_SEARCH_NAME': 'SELECT %s FROM %s WHERE %s',
+    'SELECT_ORDER_LEFTJOIN': 'SELECT %s FROM %s LEFT JOIN comments ON comments.postid = posts.postid LEFT JOIN replies ON comments.commentid = replies.commentid WHERE %s ORDER BY posts.createdate desc',
 }
 
 
@@ -60,6 +61,14 @@ class DatabaseObject(object):
         subs = [kwargs[k] for k in kwargs]
         query = queries['SELECT_ORDER'] % (vals, locs, conds)
         return self.read(query, subs)
+    def select_order_leftjoin(self, tables, *args, **kwargs):
+        vals = ','.join([l for l in args])
+        locs = ','.join(tables)
+        #conds = ' and '.join(['message like "%%%s%%"' % (kwargs[k]) for k in kwargs])
+        conds = "posts.message like \"%%" + kwargs['message'] + "%%\" or  comments.message like \"%%" + kwargs['message1'] + "%%\" or replies.message like \"%%" + kwargs['message2'] + "%%\""
+        query = queries['SELECT_ORDER_LEFTJOIN'] % (vals, locs, conds)
+        print(query)
+        return self.read(query)
     def select_order_asc(self, tables, *args, **kwargs):
         vals = ','.join([l for l in args])
         locs = ','.join(tables)
@@ -120,7 +129,7 @@ class DatabaseObject(object):
         query = queries['SELECT_SEARCH_NAME'] % (vals, locs, conds)
         #print(query)
         return self.read(query)
-
+        
 class Table(DatabaseObject):
 
     def __init__(self, data_file, table_name, values):
@@ -156,6 +165,8 @@ class Table(DatabaseObject):
 	
     def searchbyname(self, *args, **kwargs):
         return super(Table, self).searchbyname([self.table_name], *args, **kwargs)
+    def select_order_leftjoin(self, *args, **kwargs):
+        return super(Table, self).select_order_leftjoin([self.table_name], *args, **kwargs)
 
 class User(Table):
 
@@ -223,6 +234,11 @@ class Posts(Table):
         return results
     def select_order_recent(self, *args, **kwargs):
         cursor = super(Posts, self).select_order_recent(*args, **kwargs)
+        results = cursor.fetchall()
+        cursor.close()
+        return results
+    def select_order_leftjoin(self, *args, **kwargs):
+        cursor = super(Posts, self).select_order_leftjoin(*args, **kwargs)
         results = cursor.fetchall()
         cursor.close()
         return results

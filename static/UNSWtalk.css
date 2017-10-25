@@ -258,3 +258,29 @@ div.desc {
     margin-bottom:10px;
 }
 .posttitle{color:green;font-size:0.8em;margin:0px;}
+/* postbar*/
+.postbar {
+    width: 100%;
+    overflow: hidden;
+    color: #fff!important;
+    background-color: #000!important;
+}
+.barbtn{
+    white-space: normal;
+    padding: 8px 16px;
+    float: left;
+    width: auto;
+    border: none;
+    outline: none;
+    display: block;
+    background-color: inherit;
+    color: inherit;
+}
+.barbtnred{
+    color: #fff!important;
+    background-color: #f44336!important;
+}
+.barbtn-red, .w3-hover-red:hover {
+    color: #fff!important;
+    background-color: #f44336!important;
+}
