@@ -217,8 +217,8 @@ def start():
 @app.route("/images/<zid>")
 def get_image(zid):
     #print(students_dir + "/" + zid)
-    if os.path.exists('students_dir + "/" + zid/img.jpg'):
-        return send_from_directory(students_dir + "/" + zid, "img.jpg")	
+    if os.path.exists(students_dir + "/" + zid + '/img.jpg'):
+        return send_from_directory(students_dir + "/" + zid ,"img.jpg")	
     else:
         return send_from_directory("headlogo.jpg")	
         
@@ -236,7 +236,8 @@ def get_one(zid):
         index = index + 1
     session['n'] = n + 1
     flist = getFriends(zid)
-    return render_template('start.html', student_details=stu[0],student_friends = flist)
+    student_posts = getPost(zid)
+    return render_template('start.html', student_details=stu[0],student_friends = flist,student_posts = student_posts)
     '''
     n = session.get('n', 0)
     students = sorted(getStudentAll())
